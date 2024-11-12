@@ -1,0 +1,14 @@
+heat_template_version: 2016-04-08
+
+description: >
+  En simpel template for å lage et instance på Network-A2 og koble den gjennom FirstRouter.
+
+resources:
+  my_instance:
+    type: OS::Nova::Server
+    properties:
+      name: my_instance
+      image: 2d3c28bf-0b27-46f2-9c01-30f936467bc4
+      flavor: gx3.1c4r
+      networks:
+        - network: Network-A2
