@@ -1,0 +1,144 @@
+pipeline {
+    agent any
+
+    parameters {
+        booleanParam(name: 'CLEANUP', defaultValue: false, description: 'Clean up stack after tests')
+    }
+
+    environment {
+        OPENRC_PATH = '~/OpenrcFiles/IDATA2502_H24_jonasbra-openrc.sh'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', 
+                    url: 'https://github.com/bratseth1/IDATA2502-Administrasjon-skytjenester-Pipeline', 
+                    credentialsId: 'github-credentials'
+            }
+        }
+
+        stage('Install OpenStack CLI') {
+            steps {
+                sh '''
+                sudo apt update
+                sudo apt install -y python3-openstackclient
+                '''
+            }
+        }
+
+        stage('Authenticate with OpenStack') {
+            steps {
+                sh '''
+                # Source the openrc.sh file to load OpenStack environment variables
+                source $OPENRC_PATH
+                echo "Authenticated with OpenStack"
+                openstack token issue
+                '''
+            }
+        }
+
+        stage('Check if Stack Exists') {
+            steps {
+                script {
+                    def stack_check = sh(script: '''
+                    source $OPENRC_PATH
+                    openstack stack show my-stack_1 --format json > /dev/null 2>&1
+                    if [ $? -ne 0 ]; then
+                        echo "Stack does not exist"
+                        exit 0
+                    else
+                        echo "Stack already exists"
+                        exit 1
+                    fi
+                    ''', returnStatus: true)
+
+                    if (stack_check == 1) {
+                        echo "Stack already exists. Attempting to delete it first."
+                        sh '''
+                        source $OPENRC_PATH
+                        openstack stack delete --wait my-stack_1
+                        '''
+                    } else {
+                        echo "Stack does not exist. Proceeding with creation."
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Infrastructure') {
+            steps {
+                sh '''
+                source $OPENRC_PATH
+                openstack stack create -t infrastructure/template.yaml \
+                    --parameter network=Network-A2 \
+                    my-stack_1
+                '''
+            }
+        }
+
+        stage('Wait for Stack Creation') {
+            steps {
+                script {
+                    def stack_status = ''
+                    while (stack_status != 'CREATE_COMPLETE') {
+                        echo "Waiting for stack to be created..."
+                        stack_status = sh(script: '''
+                            source $OPENRC_PATH
+                            openstack stack show my-stack_1 -f value -c stack_status
+                        ''', returnStdout: true).trim()
+
+                        if (stack_status == 'CREATE_FAILED') {
+                            error("Stack creation failed")
+                        }
+                        sleep(time: 30, unit: 'SECONDS')
+                    }
+                    echo "Stack creation completed."
+                }
+            }
+        }
+
+        stage('Get Instance IP') {
+            steps {
+                script {
+                    def ip_output = sh(script: '''
+                    source $OPENRC_PATH
+                    openstack stack output show my-stack_1 instance_ip -f value -c output_value
+                    ''', returnStdout: true).trim()
+
+                    if (ip_output == 'None') {
+                        error("Instance IP is not available")
+                    } else {
+                        env.INSTANCE_IP = ip_output
+                        echo "Instance IP is: ${env.INSTANCE_IP}"
+                    }
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    if (env.INSTANCE_IP) {
+                        echo "Pinging instance at ${env.INSTANCE_IP}..."
+                        sh "ping -c 3 ${env.INSTANCE_IP}"
+                    } else {
+                        error("No instance IP available for testing")
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            when {
+                expression { return params.CLEANUP == true }
+            }
+            steps {
+                sh '''
+                source $OPENRC_PATH
+                openstack stack delete --wait my-stack_1
+                '''
+            }
+        }
+    }
+}
