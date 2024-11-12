@@ -1,0 +1,37 @@
+name: Infrastructure CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install OpenStack CLI
+      run: |
+        sudo apt update
+        sudo apt install -y python3-openstackclient
+
+    - name: Authenticate with OpenStack
+      env:
+        OS_AUTH_URL: ${{ secrets.OS_AUTH_URL }}
+        OS_PROJECT_ID: ${{ secrets.OS_PROJECT_ID }}
+        OS_PROJECT_NAME: ${{ secrets.OS_PROJECT_NAME }}
+        OS_USER_DOMAIN_NAME: ${{ secrets.OS_USER_DOMAIN_NAME }}
+        OS_USERNAME: ${{ secrets.OS_USERNAME }}
+        OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
+        OS_REGION_NAME: ${{ secrets.OS_REGION_NAME }}
+      run: |
+        # Check if OpenStack CLI is authenticated
+        openstack token issue
+
+    - name: Deploy Infrastructure
+      run: |
+        openstack stack create -t infrastructure/template.yaml --parameter image=2d3c28bf-0b27-46f2-9c01-30f936467bc4 --parameter flavor=gx3.1c4r --parameter network=Network-A2 my-stack
