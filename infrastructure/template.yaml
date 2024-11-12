@@ -3,6 +3,11 @@ heat_template_version: 2016-04-08
 description: >
   En simpel template for å lage et instance på Network-A2 og koble den gjennom FirstRouter.
 
+parameters:
+  network:
+    type: string
+    description: The network to use for the instance (e.g., Network-A2)
+
 resources:
   my_instance:
     type: OS::Nova::Server
@@ -11,9 +16,9 @@ resources:
       image: 2d3c28bf-0b27-46f2-9c01-30f936467bc4
       flavor: gx3.1c4r
       networks:
-        - network: Network-A2
+        - network: { get_param: network }
 
 outputs:
   instance_ip:
-    description: "ip adressen"
+    description: "IP address of the instance"
     value: { get_attr: [my_instance, first_address] }
