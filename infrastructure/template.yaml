@@ -12,3 +12,8 @@ resources:
       flavor: gx3.1c4r
       networks:
         - network: Network-A2
+
+outputs:
+  instance_ip:
+    description: "ip adressen"
+    value: { get_attr: [my_instance, first_address] }
