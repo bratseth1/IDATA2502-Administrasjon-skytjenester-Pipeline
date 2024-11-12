@@ -12,7 +12,7 @@ resources:
   my_instance:
     type: OS::Nova::Server
     properties:
-      name: my_instance
+      name: JenkinsController
       image: 2d3c28bf-0b27-46f2-9c01-30f936467bc4
       flavor: gx3.1c4r
       networks:
