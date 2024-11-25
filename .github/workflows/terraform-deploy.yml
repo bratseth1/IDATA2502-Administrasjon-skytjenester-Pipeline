@@ -1,0 +1,107 @@
+name: CI/CD Pipeline for Terraform and Web Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: Terraform Workflow
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.8
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: infrastructure
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: infrastructure
+
+      - name: Terraform Plan
+        id: terraform-plan
+        run: terraform plan -out=tfplan
+        working-directory: infrastructure
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+      - name: Terraform Apply
+        if: github.event_name == 'workflow_dispatch'
+        run: terraform apply -auto-approve tfplan
+        working-directory: infrastructure
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+  validate_html:
+    name: Validate HTML/CSS and Check Links
+    runs-on: ubuntu-latest
+    needs: terraform
+
+    env:
+      HTML_FILES_PATH: "./webpage/html5-boilerplate-main/dist"
+      CSS_FILES_PATH: "./webpage/html5-boilerplate-main/dist"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install tidy
+        run: sudo apt-get update && sudo apt-get install -y tidy
+
+      - name: Install stylelint
+        run: |
+          npm install -g stylelint
+          npm install -g stylelint-config-standard
+
+      - name: Validate HTML Files
+        run: |
+          for file in $(find $HTML_FILES_PATH -name "*.html"); do
+            tidy -q -e "$file"
+          done
+
+      - name: Validate CSS Files
+        run: |
+          for file in $(find $CSS_FILES_PATH -name "*.css"); do
+            stylelint "$file"
+          done
+
+      - name: Check Links in HTML
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          folder: ${{ env.HTML_FILES_PATH }}
+
+  deploy_app:
+    name: Deploy Web App to Azure
+    runs-on: ubuntu-latest
+    needs: [terraform, validate_html]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Azure Web App Deployment
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.AZURE_APP_NAME }}
+          slot-name: 'production'
+          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          package: ./webpage/html5-boilerplate-main/dist
