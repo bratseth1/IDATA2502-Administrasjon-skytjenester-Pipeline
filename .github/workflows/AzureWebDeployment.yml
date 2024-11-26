@@ -20,6 +20,18 @@ jobs:
         with:
           terraform_version: 1.9.8
 
+      - name: Check and Import Existing Resource Group
+        run: |
+          if az group exists --name "${{ secrets.RESOURCE_GROUP_NAME }}"; then
+            terraform import module.app_service.azurerm_resource_group.portfolio_resource_group \
+              /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}
+          fi
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
       - name: Terraform Init
         run: terraform init
         working-directory: infrastructure
@@ -46,7 +58,6 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
 
       - name: Wait for DNS Propagation
         run: sleep 60
