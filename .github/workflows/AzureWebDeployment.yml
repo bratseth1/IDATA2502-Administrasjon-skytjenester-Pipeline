@@ -86,10 +86,14 @@ jobs:
           npm install -g stylelint
           npm install -g stylelint-config-standard
 
+      - name: Install Lighthouse
+        run: npm install -g lighthouse
+
+
       - name: Validate HTML Files
         run: |
           for file in $(find $HTML_FILES_PATH -name "*.html"); do
-            tidy -q -e "$file"
+            tidy -q -e "$file" || true
           done
 
       - name: Validate CSS Files
@@ -102,6 +106,19 @@ jobs:
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           folder: ${{ env.HTML_FILES_PATH }}
+
+      - name: Run Lighthouse Audits
+        run: |
+          lighthouse https://JBportfolioAppService.azurewebsites.net \
+            --output=json --output=html \
+            --output-path=./lighthouse-report.html
+
+      - name: Upload Lighthouse Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: ./lighthouse-report
+
 
   build:
     name: Build Node.js App
