@@ -237,6 +237,11 @@ jobs:
       - name: Unzip deployment artifact
         run: unzip release.zip -d extracted_files
 
+      - name: Move files to root for deployment
+        run: |
+          mv extracted_files/dist/* extracted_files/
+          rmdir extracted_files/dist
+
       - name: Log in to Azure
         uses: azure/login@v1
         with:
