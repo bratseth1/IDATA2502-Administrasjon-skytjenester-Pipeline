@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -31,9 +32,19 @@ jobs:
       - name: Check and Import Existing Resource Group
         run: |
           if az group exists --name "${{ secrets.RESOURCE_GROUP_NAME }}"; then
+            echo "Resource group exists. Importing it into Terraform state..."
+            terraform init
             terraform import module.app_service.azurerm_resource_group.portfolio_resource_group \
               /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}
+          else
+            echo "Resource group does not exist. Proceeding with Terraform plan."
           fi
+        working-directory: infrastructure
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
       # Terraform Init
       - name: Terraform Init
@@ -83,6 +94,7 @@ jobs:
         with:
           name: terraform-outputs
           path: infrastructure/outputs.json
+
 
   validate_html:
     name: Validate HTML/CSS and Links
