@@ -209,7 +209,7 @@ jobs:
         working-directory: webpage/html5-boilerplate-main
 
       - name: Zip deployment package
-        run: zip release.zip ./* -r
+        run: zip -r release.zip dist/*
         working-directory: webpage/html5-boilerplate-main
 
       - name: Upload deployment artifact
@@ -256,4 +256,4 @@ jobs:
         run: |
           docker run --rm -v $(pwd):/home/lighthouse/reports \
           teambeek/docker-lighthouse lighthouse https://portfolioAppService2.azurewebsites.net \
-          --output json --output html \
+          --output=json --output=html --output-path=/home/lighthouse/reports/lighthouse-report
