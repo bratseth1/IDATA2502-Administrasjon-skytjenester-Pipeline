@@ -28,7 +28,7 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-            # Check and Import Existing Resources
+        # Check and Import Existing Resources
       - name: Check and Import Existing Resources
         run: |
           terraform init
@@ -84,12 +84,6 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
-        working-directory: infrastructure
-        env:
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
       # Terraform Init
       - name: Terraform Init
