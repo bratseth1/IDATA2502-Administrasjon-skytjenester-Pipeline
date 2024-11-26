@@ -1,9 +1,5 @@
 output "resource_group_name" {
-  value = var.resource_group_name
-}
-
-output "vnet_id" {
-  value = module.network.vnet_id
+  value = module.app_service.resource_group_name
 }
 
 output "app_service_url" {
