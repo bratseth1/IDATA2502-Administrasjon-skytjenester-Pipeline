@@ -249,20 +249,14 @@ jobs:
     needs: deploy
 
     steps:
-      - name: Install Lighthouse
-        run: npm install -g lighthouse
-
-      - name: Wait for App Service URL
-        run: sleep 60
-
-      - name: Run Lighthouse Audits
+      - name: Run Lighthouse Audits with Docker
         run: |
-          lighthouse https://portfolioAppService2.azurewebsites.net \
-            --output=json --output=html \
-            --output-path=./lighthouse-report.html
+          docker run --rm -v $(pwd):/home/lighthouse/reports --network=host lighthouseci/lighthouse-ci \
+          https://portfolioAppService2.azurewebsites.net --output json --output html --output-path=/home/lighthouse/reports/lighthouse-report.html
 
       - name: Upload Lighthouse Report
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-report
           path: ./lighthouse-report.html
+
