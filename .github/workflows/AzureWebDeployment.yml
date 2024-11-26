@@ -91,7 +91,6 @@ jobs:
           for file in $(find $HTML_FILES_PATH -name "*.html"); do
             tidy -q -e "$file" || true
           done
-
         continue-on-error: true
 
       - name: Validate CSS Files
@@ -99,16 +98,13 @@ jobs:
           for file in $(find $CSS_FILES_PATH -name "*.css"); do
             stylelint "$file" || true
           done
-
-       continue-on-error: true
+        continue-on-error: true
 
       - name: Check Links in HTML
         uses: gaurav-nelson/github-action-markdown-link-check@v1
         with:
           folder: ${{ env.HTML_FILES_PATH }}
-
         continue-on-error: true
-
 
   build:
     name: Build Node.js App
@@ -162,8 +158,6 @@ jobs:
           app-name: JBportfolioAppService
           slot-name: production
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-
-
 
   lighthouse:
     name: Lighthouse Audits
