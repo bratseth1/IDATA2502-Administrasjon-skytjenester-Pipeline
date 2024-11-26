@@ -20,7 +20,7 @@ variable "vnet_address_space" {
 
 variable "subnet_name" {
   description = "Name of the subnet"
-  default     = "portfolioSubnet4
+  default     = "portfolioSubnet4"
 }
 
 variable "subnet_address_prefix" {
