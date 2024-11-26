@@ -10,6 +10,7 @@ jobs:
   validate_html:
     name: Validate HTML/CSS and Links
     runs-on: ubuntu-latest
+    needs: terraform
 
     env:
       HTML_FILES_PATH: "./webpage/html5-boilerplate-main/dist"
@@ -18,6 +19,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Download Terraform Outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: terraform-outputs
 
       - name: Install tidy
         run: sudo apt-get update && sudo apt-get install -y tidy
