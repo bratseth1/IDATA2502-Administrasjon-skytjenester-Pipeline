@@ -4,6 +4,7 @@ variable "location" {
 
 variable "resource_group_name" {
   description = "Name of the resource group"
+  default     = "portfolioResourceGroup"
 }
 
 variable "app_service_plan_name" {
@@ -12,4 +13,5 @@ variable "app_service_plan_name" {
 
 variable "app_service_name" {
   description = "Name of the App Service"
+
 }
