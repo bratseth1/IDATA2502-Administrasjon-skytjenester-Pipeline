@@ -5,12 +5,12 @@ variable "location" {
 
 variable "resource_group_name" {
   description = "Name of the resource group"
-  default     = "portfolioResourceGroup3"
+  default     = "portfolioResourceGroup4"
 }
 
 variable "vnet_name" {
   description = "Name of the virtual network"
-  default     = "portfolioVNet3"
+  default     = "portfolioVNet4"
 }
 
 variable "vnet_address_space" {
@@ -20,7 +20,7 @@ variable "vnet_address_space" {
 
 variable "subnet_name" {
   description = "Name of the subnet"
-  default     = "portfolioSubnet3"
+  default     = "portfolioSubnet4
 }
 
 variable "subnet_address_prefix" {

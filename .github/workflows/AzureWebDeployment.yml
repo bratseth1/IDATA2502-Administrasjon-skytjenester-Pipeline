@@ -165,7 +165,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: JBportfolioAppService
+          app-name: JBportfolioAppService2
           slot-name: production
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ./dist
@@ -184,7 +184,7 @@ jobs:
 
       - name: Run Lighthouse Audits
         run: |
-          lighthouse https://JBportfolioAppService.azurewebsites.net \
+          lighthouse https://JBportfolioAppService2.azurewebsites.net \
             --output=json --output=html \
             --output-path=./lighthouse-report.html
 
