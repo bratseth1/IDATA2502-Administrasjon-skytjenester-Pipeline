@@ -1,27 +1,27 @@
+resource "azurerm_resource_group" "portfolio_resource_group" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
 resource "azurerm_application_insights" "app_insights" {
   name                = "${var.app_service_name}-ai"
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.portfolio_resource_group.name
   application_type    = "web"
 }
 
 resource "azurerm_service_plan" "app_service_plan" {
   name                = var.app_service_plan_name
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.portfolio_resource_group.name
   os_type             = "Linux"
   sku_name            = "B1"
-}
-
-resource "azurerm_resource_group" "portfolio_resource_group" {
-  name     = var.resource_group_name
-  location = var.location
 }
 
 resource "azurerm_linux_web_app" "app_service" {
   name                = var.app_service_name
   location            = var.location
-  resource_group_name = var.resource_group_name
+  resource_group_name = azurerm_resource_group.portfolio_resource_group.name
   service_plan_id     = azurerm_service_plan.app_service_plan.id
   https_only          = true
 
