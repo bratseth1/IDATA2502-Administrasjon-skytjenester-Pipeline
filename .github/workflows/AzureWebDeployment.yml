@@ -28,18 +28,19 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      # Check and Import Existing Resources
+            # Check and Import Existing Resources
       - name: Check and Import Existing Resources
         run: |
-          # Check and import Resource Group
+          terraform init
+
+          # Import Resource Group
           if az group exists --name "${{ secrets.RESOURCE_GROUP_NAME }}"; then
             echo "Resource group exists. Importing into Terraform state..."
-            terraform init
             terraform import module.app_service.azurerm_resource_group.portfolio_resource_group \
               /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}
           fi
 
-          # Check and import Application Insights
+          # Import Application Insights
           if az resource show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
             --resource-type "Microsoft.Insights/components" --name "${{ secrets.APP_INSIGHTS_NAME }}" > /dev/null 2>&1; then
             echo "Application Insights exists. Importing into Terraform state..."
@@ -47,7 +48,7 @@ jobs:
               /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Insights/components/${{ secrets.APP_INSIGHTS_NAME }}
           fi
 
-          # Check and import Service Plan
+          # Import Service Plan
           if az resource show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
             --resource-type "Microsoft.Web/serverFarms" --name "${{ secrets.SERVICE_PLAN_NAME }}" > /dev/null 2>&1; then
             echo "Service Plan exists. Importing into Terraform state..."
@@ -55,12 +56,34 @@ jobs:
               /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Web/serverFarms/${{ secrets.SERVICE_PLAN_NAME }}
           fi
 
-          # Check and import Virtual Network
+          # Import Virtual Network
           if az network vnet show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" --name "${{ secrets.VNET_NAME }}" > /dev/null 2>&1; then
             echo "Virtual Network exists. Importing into Terraform state..."
             terraform import module.network.azurerm_virtual_network.vnet \
               /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Network/virtualNetworks/${{ secrets.VNET_NAME }}
           fi
+
+          # Import Subnet
+          if az network vnet subnet show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
+            --vnet-name "${{ secrets.VNET_NAME }}" --name "${{ secrets.SUBNET_NAME }}" > /dev/null 2>&1; then
+            echo "Subnet exists. Importing into Terraform state..."
+            terraform import module.network.azurerm_subnet.subnet \
+              /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Network/virtualNetworks/${{ secrets.VNET_NAME }}/subnets/${{ secrets.SUBNET_NAME }}
+          fi
+
+          # Import Linux Web App
+          if az webapp show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" --name "${{ secrets.APP_SERVICE_NAME }}" > /dev/null 2>&1; then
+            echo "Linux Web App exists. Importing into Terraform state..."
+            terraform import module.app_service.azurerm_linux_web_app.app_service \
+              /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Web/sites/${{ secrets.APP_SERVICE_NAME }}
+          fi
+        working-directory: infrastructure
+        env:
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
         working-directory: infrastructure
         env:
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
