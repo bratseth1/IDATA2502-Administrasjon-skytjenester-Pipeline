@@ -257,13 +257,3 @@ jobs:
           docker run --rm -v $(pwd):/home/lighthouse/reports \
           teambeek/docker-lighthouse lighthouse https://portfolioAppService2.azurewebsites.net \
           --output json --output html \
-          --output-path /home/lighthouse/reports/lighthouse-report.report.report.html
-
-      - name: Rename Lighthouse Report for Consistency
-        run: mv /home/lighthouse/reports/lighthouse-report.report.report.html ./lighthouse-report.html
-
-      - name: Upload Lighthouse Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-report
-          path: ./lighthouse-report.html
