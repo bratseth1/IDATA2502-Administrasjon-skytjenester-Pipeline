@@ -28,16 +28,38 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      # Check and Import Existing Resource Group
-      - name: Check and Import Existing Resource Group
+      # Check and Import Existing Resources
+      - name: Check and Import Existing Resources
         run: |
+          # Check and import Resource Group
           if az group exists --name "${{ secrets.RESOURCE_GROUP_NAME }}"; then
-            echo "Resource group exists. Importing it into Terraform state..."
+            echo "Resource group exists. Importing into Terraform state..."
             terraform init
             terraform import module.app_service.azurerm_resource_group.portfolio_resource_group \
               /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}
-          else
-            echo "Resource group does not exist. Proceeding with Terraform plan."
+          fi
+
+          # Check and import Application Insights
+          if az resource show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
+            --resource-type "Microsoft.Insights/components" --name "${{ secrets.APP_INSIGHTS_NAME }}" > /dev/null 2>&1; then
+            echo "Application Insights exists. Importing into Terraform state..."
+            terraform import module.app_service.azurerm_application_insights.app_insights \
+              /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Insights/components/${{ secrets.APP_INSIGHTS_NAME }}
+          fi
+
+          # Check and import Service Plan
+          if az resource show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" \
+            --resource-type "Microsoft.Web/serverFarms" --name "${{ secrets.SERVICE_PLAN_NAME }}" > /dev/null 2>&1; then
+            echo "Service Plan exists. Importing into Terraform state..."
+            terraform import module.app_service.azurerm_service_plan.app_service_plan \
+              /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Web/serverFarms/${{ secrets.SERVICE_PLAN_NAME }}
+          fi
+
+          # Check and import Virtual Network
+          if az network vnet show --resource-group "${{ secrets.RESOURCE_GROUP_NAME }}" --name "${{ secrets.VNET_NAME }}" > /dev/null 2>&1; then
+            echo "Virtual Network exists. Importing into Terraform state..."
+            terraform import module.network.azurerm_virtual_network.vnet \
+              /subscriptions/${{ secrets.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RESOURCE_GROUP_NAME }}/providers/Microsoft.Network/virtualNetworks/${{ secrets.VNET_NAME }}
           fi
         working-directory: infrastructure
         env:
@@ -94,6 +116,7 @@ jobs:
         with:
           name: terraform-outputs
           path: infrastructure/outputs.json
+
 
 
   validate_html:
