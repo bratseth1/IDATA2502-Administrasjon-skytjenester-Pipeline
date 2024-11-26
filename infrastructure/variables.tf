@@ -1,6 +1,6 @@
 variable "location" {
   description = "Azure region for resource deployment"
-  default     = "West Europe"
+  default     = "North Europe"
 }
 
 variable "resource_group_name" {
