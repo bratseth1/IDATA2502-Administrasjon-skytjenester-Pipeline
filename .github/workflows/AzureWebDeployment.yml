@@ -15,6 +15,8 @@ jobs:
       # Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       # Log in to Azure
       - name: Log in to Azure
@@ -200,6 +202,9 @@ jobs:
         run: npm install
         working-directory: webpage/html5-boilerplate-main
 
+      - name: Clean Build Directory
+        run: rm -rf webpage/html5-boilerplate-main/dist/*
+        
       - name: Build the app
         run: npm run build --if-present
         working-directory: webpage/html5-boilerplate-main
@@ -232,6 +237,17 @@ jobs:
       - name: Unzip deployment artifact
         run: unzip release.zip -d extracted_files
 
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete existing content in wwwroot
+        run: |
+          az webapp config appsettings set --name portfolioAppService2 --resource-group ${{ secrets.RESOURCE_GROUP_NAME }} --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+          az webapp deployment source delete --name portfolioAppService2 --resource-group ${{ secrets.RESOURCE_GROUP_NAME }}
+          echo "Deleted existing content in wwwroot."
+
       - name: Deploy extracted content to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
@@ -239,6 +255,7 @@ jobs:
           slot-name: production
           publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
           package: ./extracted_files
+
 
   lighthouse:
     name: Lighthouse Audits
