@@ -5,12 +5,12 @@ variable "location" {
 
 variable "resource_group_name" {
   description = "Name of the resource group"
-  default     = "portfolioResourceGroup"
+  default     = "portfolioResourceGroup1"
 }
 
 variable "vnet_name" {
   description = "Name of the virtual network"
-  default     = "portfolioVNet"
+  default     = "portfolioVNet1"
 }
 
 variable "vnet_address_space" {
@@ -20,7 +20,7 @@ variable "vnet_address_space" {
 
 variable "subnet_name" {
   description = "Name of the subnet"
-  default     = "portfolioSubnet"
+  default     = "portfolioSubnet1"
 }
 
 variable "subnet_address_prefix" {
@@ -30,10 +30,10 @@ variable "subnet_address_prefix" {
 
 variable "app_service_plan_name" {
   description = "Name of the App Service Plan"
-  default     = "portfolioAppServicePlan"
+  default     = "portfolioAppServicePlan1"
 }
 
 variable "app_service_name" {
   description = "Name of the App Service"
-  default     = "portfolioAppService"
+  default     = "portfolioAppService1"
 }
