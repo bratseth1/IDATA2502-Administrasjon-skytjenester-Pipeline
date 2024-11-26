@@ -118,7 +118,7 @@ jobs:
 
       # Wait for DNS Propagation
       - name: Wait for DNS Propagation
-        run: sleep 60
+        run: sleep 10
 
       # Export Terraform Outputs
       - name: Export Terraform Outputs
@@ -230,7 +230,7 @@ jobs:
           name: nodejs-app
 
       - name: Wait Before Deployment
-        run: sleep 30
+        run: sleep 10
 
       - name: Unzip deployment artifact
         run: unzip release.zip
@@ -253,11 +253,11 @@ jobs:
         run: npm install -g lighthouse
 
       - name: Wait for App Service URL
-        run: sleep 300
+        run: sleep 60
 
       - name: Run Lighthouse Audits
         run: |
-          lighthouse https://JBportfolioAppService2.azurewebsites.net \
+          lighthouse https://portfolioAppService2.azurewebsites.net \
             --output=json --output=html \
             --output-path=./lighthouse-report.html
 
