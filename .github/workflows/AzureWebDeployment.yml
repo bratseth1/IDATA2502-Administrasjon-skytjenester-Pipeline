@@ -48,6 +48,9 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
+      - name: Wait for DNS Propagation
+        run: sleep 60
+
       - name: Export Terraform Outputs
         id: export-outputs
         run: |
@@ -141,6 +144,7 @@ jobs:
         with:
           name: nodejs-app
           path: webpage/html5-boilerplate-main/release.zip        
+
   deploy:
     name: Deploy Node.js App
     runs-on: ubuntu-latest
@@ -151,6 +155,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nodejs-app
+
+      - name: Wait Before Deployment
+        run: sleep 30
 
       - name: Unzip deployment artifact
         run: unzip release.zip
@@ -171,6 +178,9 @@ jobs:
     steps:
       - name: Install Lighthouse
         run: npm install -g lighthouse
+
+      - name: Wait for App Service URL
+        run: sleep 300
 
       - name: Run Lighthouse Audits
         run: |
