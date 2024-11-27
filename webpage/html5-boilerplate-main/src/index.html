@@ -1,34 +1,124 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infrastructure Delivery Pipeline Project</title>
   <link rel="stylesheet" href="css/style.css">
-  <meta name="description" content="">
+  <meta name="description" content="A project demonstrating the creation of an Infrastructure Delivery Pipeline using IaC principles.">
 
-  <meta property="og:title" content="">
-  <meta property="og:type" content="">
+  <meta property="og:title" content="Infrastructure Delivery Pipeline">
+  <meta property="og:type" content="website">
   <meta property="og:url" content="">
   <meta property="og:image" content="">
-  <meta property="og:image:alt" content="">
+  <meta property="og:image:alt" content="Infrastructure Delivery Pipeline Project">
 
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.png">
-
   <link rel="manifest" href="site.webmanifest">
   <meta name="theme-color" content="#fafafa">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #e6f7ff, #ffffff);
+      color: #333;
+      animation: fadeIn 1s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    header {
+      background: linear-gradient(45deg, #0078d4, #00a4d4);
+      color: white;
+      padding: 1.5em 0;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4em;
+      font-weight: bold;
+    }
+
+    header h2 {
+      margin: 5px 0;
+      font-size: 1.4em;
+      font-weight: 300;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.8s ease-in-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1em;
+      color: #666;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    p {
+      line-height: 1.8;
+      font-size: 1.1em;
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    <h1>Infrastructure Delivery Pipeline</h1>
+    <h2>Course Code: IDATA2502</h2>
+    <h2>Jonas Bratseth</h2>
+  </header>
 
-  <!-- Add your site or application content here -->
-  <p>This project demonstrates the creation of a reliable and scalable Infrastructure Delivery Pipeline using Infrastructure as Code (IaC) principles.
-    Leveraging Terraform, Azure, and GitHub Actions, the pipeline automates provisioning and deployment of cloud resources..</p>
+  <main>
+    <p>
+      Welcome to my project demonstrating the creation of a scalable and reliable Infrastructure Delivery Pipeline. This pipeline showcases the use of Infrastructure as Code (IaC) principles for automating the provisioning and deployment of cloud resources.
+    </p>
+    <p>
+      Using tools like <strong>Terraform</strong>, <strong>Azure</strong>, and <strong>GitHub Actions</strong>, the project ensures secure, repeatable, and efficient workflows. It highlights CI/CD best practices for modern cloud infrastructure management.
+    </p>
+  </main>
+
+  <footer>
+    <p>© 2024 Jonas Bratseth - IDATA2502</p>
+  </footer>
+
   <script src="js/app.js"></script>
-
 </body>
 
 </html>
